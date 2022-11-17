@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-
 const userSchema = mongoose.Schema({
     email:{
         type:String,
@@ -23,32 +22,11 @@ const userSchema = mongoose.Schema({
         required:true,
         trim:true,
     },
-    role:{
-        type:String,
-        enum:['user','admin'],
-        default: 'user'
-    },
-    firstname:{
-        type:String,
-        maxLength:100,
-        trim:true
-    },
-    lastname:{
-        type:String,
-        maxLength:100,
-        trim:true
-    },
-    age:{
-        type:Number
-    },
-    date:{
-        type: Date,
-        default: Date.now
-    },
-    verified:{
-        type:Boolean,
-        default: false
+    coins:{
+        type:Number,
+        default:100
     }
+   
 })
 
 userSchema.pre('save',async function(next){
@@ -69,9 +47,10 @@ userSchema.statics.emailTaken = async function(email){
 
 userSchema.methods.generateAuthToken = function(){
     let user = this;
-    const userObj = { sub: user._id.toHexString(),email: user.emal};
+    const userObj = { sub: user._id.toHexString(),email: user.email,coins:user.coins};
     const token = jwt.sign(userObj,process.env.DB_SECRET,{ expiresIn:'1d'})
     return token;
+
 }
 
 userSchema.methods.comparePassword = async function(candidatePassword){
